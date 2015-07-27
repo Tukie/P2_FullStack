@@ -6,4 +6,21 @@
 -- You can write comments in this file by starting them with two dashes, like
 -- these lines here.
 
+CREATE DATABASE tournament;
 
+\c tournament;
+
+CREATE TABLE players ( id SERIAL PRIMARY KEY,
+                        name TEXT);
+                        
+CREATE TABLE matches ( p1 INTEGER REFERENCES players(id),
+                        p2 INTEGER REFERENCES players(id),
+                        winnerID INTEGER);
+
+CREATE VIEW mat_total AS
+SELECT players.id, count (matches.winnerID) as mat_num FROM players left join matches on matches.p1 = players.id 
+or matches.p2 = players.id group by players.id order by mat_num DESC;                        
+                        
+CREATE VIEW win_total AS
+SELECT players.id, players.name, count(matches.winnerID) as win_num 
+FROM players left join matches on matches.winnerID = players.id group by players.id ORDER by win_num DESC;

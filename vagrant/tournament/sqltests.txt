@@ -1,0 +1,23 @@
+SELECT players.id, players.name, count(matches.winnerID) as count FROM players left join matches on matches.winnerID = players.id ORDER BY count DESC
+
+
+SELECT players.id, players.name
+, count(matches.winnerID) as num_winners 
+, count(count_matches.id) as num_matches 
+FROM players left join matches 
+on matches.winnerID = players.id 
+,(SELECT players.id, count (players.id) from players left join matches on matches.p1 = players.id 
+or matches.p2 = players.id group by players.id) as count_matches where count_matches.id = players.id
+GROUP BY players.id ORDER BY num_matches DESC;
+
+SELECT players.id, count (players.id) from players left join matches on matches.p1 = players.id 
+or matches.p2 = players.id group by players.id order by count DESC;
+
+select players.id, players.name, count(*) as num 
+from players left join matches on matches.p1 = players.id or matches.p2= players.id group by players.id;
+
+INSERT INTO matches (p1,p2,winnerID) values ('118','119','119');
+
+SELECT win_total.id, win_total.name, win_total.win_num, mat_total.mat_num
+FROM win_total, mat_total where mat_total.id = win_total.id
+ORDER BY win_total.win_num DESC;

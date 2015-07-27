@@ -61,11 +61,13 @@ def testStandingsBeforeMatches():
     deletePlayers()
     registerPlayer("Melpomene Murray")
     registerPlayer("Randy Schwartz")
+    
     standings = playerStandings()
     if len(standings) < 2:
         raise ValueError("Players should appear in playerStandings even before "
                          "they have played any matches.")
     elif len(standings) > 2:
+        print len(standings)
         raise ValueError("Only registered players should appear in standings.")
     if len(standings[0]) != 4:
         raise ValueError("Each playerStandings row should have four columns.")
@@ -108,12 +110,18 @@ def testPairings():
     registerPlayer("Fluttershy")
     registerPlayer("Applejack")
     registerPlayer("Pinkie Pie")
+    registerPlayer("Mr. X")
+    registerPlayer("Mr. Y")
     standings = playerStandings()
-    [id1, id2, id3, id4] = [row[0] for row in standings]
+    [id1, id2, id3, id4, id5, id6] = [row[0] for row in standings]
     reportMatch(id1, id2)
     reportMatch(id3, id4)
+    reportMatch(id5, id6)
+    print playerStandings()
     pairings = swissPairings()
-    if len(pairings) != 2:
+    print pairings
+    
+    if len(pairings) != len(standings):
         raise ValueError(
             "For four players, swissPairings should return two pairs.")
     [(pid1, pname1, pid2, pname2), (pid3, pname3, pid4, pname4)] = pairings
