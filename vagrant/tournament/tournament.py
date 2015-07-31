@@ -1,42 +1,46 @@
 #!/usr/bin/env python
 #
 # tournament.py -- implementation of a Swiss-system tournament
+# author: Yongkie Wiyogo
+# date  : 31.07.2015
 
 import psycopg2
 
 
-def connect():
+def connect(database_name="tournament"):
     """Connect to the PostgreSQL database.  Returns a database connection."""
-    return psycopg2.connect("dbname=tournament")
+    try:
+        db = psycopg2.connect("dbname={}".format(database_name))
+        cursor = db.cursor()
+        return db, cursor
+    except:
+        print("<your error message>")
 
 
 def deleteMatches():
     """Remove all the match records from the database."""
-    DB = psycopg2.connect("dbname=tournament")
-    cur = DB.cursor()
+    db, cur = connect()
     cur.execute("DELETE FROM matches")
-    DB.commit()
-    DB.close()
+    db.commit()
+    db.close()
 
 
 def deletePlayers():
     """Remove all the player records from the database."""
-    DB = psycopg2.connect("dbname=tournament")
-    cur = DB.cursor()
+    db, cur = connect()
     cur.execute("DELETE FROM players")
-    DB.commit()
-    DB.close()
+    db.commit()
+    db.close()
 
 
 def countPlayers():
     """Returns the number of players currently registered."""
-    DB = psycopg2.connect("dbname=tournament")
-    cur = DB.cursor()
+    db, cur = connect()
     cur.execute("SELECT count(*) as num FROM players")
     result = cur.fetchone()
-    num_of_player = result[0]
-    DB.commit()
-    DB.close()
+    num_of_player = int(result[0])
+    db.commit()
+    db.close()
     return num_of_player
 
 
@@ -49,11 +53,13 @@ def registerPlayer(name):
     Args:
       name: the player's full name (need not be unique).
     """
-    DB = psycopg2.connect("dbname=tournament")
-    cur = DB.cursor()
-    cur.execute("INSERT INTO players (name) values (%s)", (name,))
-    DB.commit()
-    DB.close()
+    db, cur = connect()
+    query = "INSERT INTO players (name) values (%s)"
+    parameter = (name,)
+    # use query parameters to protect against SQL injection attacks
+    cur.execute(query, parameter)
+    db.commit()
+    db.close()
 
 
 def playerStandings():
@@ -69,20 +75,19 @@ def playerStandings():
         wins: the number of matches the player has won
         matches: the number of matches the player has played
     """
-    DB = psycopg2.connect("dbname=tournament")
-    cur = DB.cursor()
+    db, cur = connect()
     cur.execute("SELECT win_total.id, win_total.name, win_total.win_num\
                 , mat_total.mat_num \
                 FROM win_total, mat_total where mat_total.id = win_total.id \
                 ORDER BY win_total.win_num DESC;")
-    DB.commit()
+    db.commit()
     stands = []
     for row in cur.fetchall():
         # standing format: id, name, wins, matches
         stands.append((str(row[0]), str(row[1]), row[2], row[3]))
     # print "standings: "
     # print stands
-    DB.close()
+    db.close()
     return stands
 
 
@@ -93,12 +98,11 @@ def reportMatch(winner, loser):
       winner:  the id number of the player who won
       loser:  the id number of the player who lost
     """
-    DB = psycopg2.connect("dbname=tournament")
-    cur = DB.cursor()
+    db, cur = connect()
     cur.execute("INSERT INTO matches (p1,p2,winnerID) \
                 values (%s,%s,%s);", (winner, loser, winner,))
-    DB.commit()
-    DB.close()
+    db.commit()
+    db.close()
 
 
 def swissPairings():
@@ -117,16 +121,10 @@ def swissPairings():
         name2: the second player's name
     """
     # Get data players list and theirs win_record sorted by number of winners
-    DB = psycopg2.connect("dbname=tournament")
-    cur = DB.cursor()
-    cur.execute("DROP VIEW win_total")
-    cur.execute("CREATE VIEW win_total AS \
-                SELECT players.id, players.name, count(matches.winnerID) \
-                as win_num FROM players LEFT JOIN matches on \
-                matches.winnerID = players.id \
-                GROUP BY players.id ORDER by win_num DESC;")
+    db, cur = connect()
+    # use directly the VIEW database
     cur.execute("SELECT * FROM win_total")
-    DB.commit()
+    db.commit()
 
     rows = cur.fetchall()
     # print rows
@@ -141,6 +139,6 @@ def swissPairings():
         else:
             pairs[len(pairs)-1] = pairs[len(pairs)-1]\
                                 + (str(rows[i][0]), str(rows[i][1]))
-    DB.close()
+    db.close()
     # print pairs
     return pairs
