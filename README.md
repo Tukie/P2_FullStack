@@ -18,18 +18,18 @@ Please follow these steps to create the environment until running the unit test
 
 Creating Database
 ----------------- 
-In order to setup the database please start [`psql`] with this command:
+In order to setup the database please start `psql` with this command:
     psql -f tournament.sql
 
-As an alternative, you can build and access the database by executing [`psql`],
+As an alternative, you can build and access the database by executing `psql`,
 and then followed by 
     \i tournament.sql
-By typing [`\q`] we can exit psql program
+By typing `\q` we can exit psql program
 
 Development code
 ----------------
 the logic behind the tournament and its database processing are defined in
-[`tournament.py`]
+`tournament.py`.
 
 Test
 ------
