@@ -14,7 +14,7 @@ def connect(database_name="tournament"):
         cursor = db.cursor()
         return db, cursor
     except:
-        print("<your error message>")
+        print("Connection to PostgreSQL cannot be established.")
 
 
 def deleteMatches():
@@ -82,8 +82,6 @@ def playerStandings():
     for row in cur.fetchall():
         # standing format: id, name, wins, matches
         stands.append((str(row[0]), str(row[1]), row[2], row[3]))
-    # print "standings: "
-    # print stands
     db.close()
     return stands
 
@@ -124,7 +122,6 @@ def swissPairings():
     db.commit()
 
     rows = cur.fetchall()
-    # print rows
     if (len(rows) % 2 != 0):
         raise ValueError(
             "Number of Player is not suitable for Swiss pairing.")
@@ -137,5 +134,4 @@ def swissPairings():
             pairs[len(pairs)-1] = pairs[len(pairs)-1]\
                                 + (str(rows[i][0]), str(rows[i][1]))
     db.close()
-    # print pairs
     return pairs
