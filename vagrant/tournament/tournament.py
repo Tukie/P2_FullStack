@@ -76,10 +76,7 @@ def playerStandings():
         matches: the number of matches the player has played
     """
     db, cur = connect()
-    cur.execute("SELECT win_total.id, win_total.name, win_total.win_num\
-                , mat_total.mat_num \
-                FROM win_total, mat_total where mat_total.id = win_total.id \
-                ORDER BY win_total.win_num DESC;")
+    cur.execute("SELECT * FROM players_stands")
     db.commit()
     stands = []
     for row in cur.fetchall():

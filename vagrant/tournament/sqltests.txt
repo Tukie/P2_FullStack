@@ -18,6 +18,6 @@ from players left join matches on matches.p1 = players.id or matches.p2= players
 
 INSERT INTO matches (p1,p2,winnerID) values ('118','119','119');
 
-SELECT win_total.id, win_total.name, win_total.win_num, mat_total.mat_num
-FROM win_total, mat_total where mat_total.id = win_total.id
+SELECT win_total.id, win_total.name, win_total.win_num, mat_total.mat_num \
+FROM win_total, mat_total where mat_total.id = win_total.id \
 ORDER BY win_total.win_num DESC;
